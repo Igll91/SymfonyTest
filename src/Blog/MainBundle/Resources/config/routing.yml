@@ -1,0 +1,3 @@
+blog_main_homepage:
+    resource: "@BlogMainBundle/Controller/DefaultController.php"
+    type:     annotation
