@@ -1,29 +1,82 @@
 {% extends "BlogMainBundle::mainView.html.twig" %}
 
-{% block title %}Symfony - Welcome !{% endblock %}
+{% block head %}
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Moj Blog</title>
+{% endblock %}
 
 {% block content %}
-	<p>
-		<h> CATEGORIES </h>
 
-		<select>
-			{% for item in categories %}
-				<option value = {{ item.getId() }}>{{ item.getName() }}</option>
+<div class="container">
+	<div class="row">
+		<div class="col-md-6 col-md-offset-3">
+			<p class="text-center">
+				<strong> Filtriraj po kategoriji: </strong>
+
+				<select>
+				
+					<option value = "-1" >- Ništa nije odabrano -</option>
+					
+					{% for item in categories %}
+						<option value = {{ item.getId() }}>{{ item.getName() }}</option>
+					{% endfor %}
+				</select>
+		
+				<!-- Button trigger modal -->
+				<button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+				  +
+				</button>
+
+				{% set currentPath = path(app.request.attributes.get('_route')) ~ "spremiKategoriju" %}
+				
+				<!-- Modal -->
+				<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				  <div class="modal-dialog">
+					<div class="modal-content">
+					  <div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title" id="myModalLabel">Dodavanje nove kategorije.</h4>
+					  </div>
+					  
+					  <form role="form" method="POST" action="{{ currentPath }}" name="newCategory">
+						<input type="text" class="form-control" id="newCategoryText" name = "newCategoryText" placeholder="Unesite naziv nove kategorije...">
+						  <div class="modal-footer">
+							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+							<button type="submit" class="btn btn-primary">Spremi</button>
+						  </div>
+					  </form>
+					  
+					</div>
+				  </div>
+				</div>
+				
+			</p>
+		</div>
+	</div>
+	
+	<div class="row">
+		<div class="col-md-8 col-md-offset-2">
+
+			{% for item in articles %}
+				<div class="jumbotron">
+					<div class="panel panel-info">
+						<blockquote>
+						  <p>Naslov: <strong> {{ item.getTitle() }} </strong> </p>
+						  <footer>{{ item.getCategory().getName() }}</footer>
+						</blockquote>
+					</div>
+				
+					<p> <kbd>{{ item.getText() }} </kbd> </p>
+					
+					<button type="button" class="btn btn btn-danger btn-lg btn-block">
+					Uredi
+					</button>
+				</div>
 			{% endfor %}
-		</select>
-	</p>
 
-	<p>
-		<h> ARTICLES </h>
-
-		{% for item in articles %}
-			<p>{{ item.getTitle() }}</p>
-			<p>{{ item.getText() }}</p>
-			<p>{{ item.getCategory().getName() }}</p> 
-		{% endfor %}
-
-	</p>
-
+		</div>
+	</div>
+</div>
 {% endblock %}
 
 

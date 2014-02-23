@@ -210,7 +210,7 @@
     <parameter key="router.request_context.host">localhost</parameter>
     <parameter key="router.request_context.scheme">http</parameter>
     <parameter key="router.request_context.base_url"></parameter>
-    <parameter key="router.resource">G:/htdocs/FoiTask/app/cache/dev/assetic/routing.yml</parameter>
+    <parameter key="router.resource">G:/htdocs/FoiTask/app/config/routing_dev.yml</parameter>
     <parameter key="router.cache_class_prefix">appDev</parameter>
     <parameter key="request_listener.http_port">80</parameter>
     <parameter key="request_listener.https_port">443</parameter>
@@ -427,7 +427,7 @@
     <parameter key="assetic.helper.static.class">Symfony\Bundle\AsseticBundle\Templating\StaticAsseticHelper</parameter>
     <parameter key="assetic.php_formula_loader.class">Symfony\Bundle\AsseticBundle\Factory\Loader\AsseticHelperFormulaLoader</parameter>
     <parameter key="assetic.debug">true</parameter>
-    <parameter key="assetic.use_controller">true</parameter>
+    <parameter key="assetic.use_controller">false</parameter>
     <parameter key="assetic.enable_profiler">false</parameter>
     <parameter key="assetic.read_from">G:/htdocs/FoiTask/app/../web</parameter>
     <parameter key="assetic.write_to">G:/htdocs/FoiTask/app/../web</parameter>
@@ -438,11 +438,6 @@
     <parameter key="assetic.sass.bin">/usr/bin/sass</parameter>
     <parameter key="assetic.filter.cssrewrite.class">Assetic\Filter\CssRewriteFilter</parameter>
     <parameter key="assetic.twig_extension.functions" type="collection"/>
-    <parameter key="assetic.controller.class">Symfony\Bundle\AsseticBundle\Controller\AsseticController</parameter>
-    <parameter key="assetic.routing_loader.class">Symfony\Bundle\AsseticBundle\Routing\AsseticLoader</parameter>
-    <parameter key="assetic.cache.class">Assetic\Cache\FilesystemCache</parameter>
-    <parameter key="assetic.use_controller_worker.class">Symfony\Bundle\AsseticBundle\Factory\Worker\UseControllerWorker</parameter>
-    <parameter key="assetic.request_listener.class">Symfony\Bundle\AsseticBundle\EventListener\RequestListener</parameter>
     <parameter key="doctrine.dbal.logger.chain.class">Doctrine\DBAL\Logging\LoggerChain</parameter>
     <parameter key="doctrine.dbal.logger.profiling.class">Doctrine\DBAL\Logging\DebugStack</parameter>
     <parameter key="doctrine.dbal.logger.class">Symfony\Bridge\Doctrine\Logger\DbalLogger</parameter>
@@ -570,6 +565,9 @@
     <parameter key="console.command.ids" type="collection"/>
   </parameters>
   <services>
+    <service id="twig.extension.debug" class="Twig_Extensions_Extension_Debug">
+      <tag name="twig.extension"/>
+    </service>
     <service id="controller_name_converter" class="Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser" public="false">
       <tag name="monolog.logger" channel="request"/>
       <argument type="service" id="kernel"/>
@@ -933,14 +931,6 @@
         <argument type="collection">
           <argument>data_collector.router</argument>
           <argument>onKernelController</argument>
-        </argument>
-        <argument>0</argument>
-      </call>
-      <call method="addListenerService">
-        <argument>kernel.request</argument>
-        <argument type="collection">
-          <argument>assetic.request_listener</argument>
-          <argument>onKernelRequest</argument>
         </argument>
         <argument>0</argument>
       </call>
@@ -1565,14 +1555,6 @@
           </call>
           <call method="addLoader">
             <argument type="service">
-              <service class="Symfony\Bundle\AsseticBundle\Routing\AsseticLoader" public="false">
-                <tag name="routing.loader"/>
-                <argument type="service" id="assetic.asset_manager"/>
-              </service>
-            </argument>
-          </call>
-          <call method="addLoader">
-            <argument type="service">
               <service class="Symfony\Component\Routing\Loader\AnnotationDirectoryLoader" public="false">
                 <tag name="routing.loader"/>
                 <argument type="service" id="file_locator"/>
@@ -1962,6 +1944,9 @@
         <argument key="paths" type="collection"/>
       </argument>
       <call method="addExtension">
+        <argument type="service" id="twig.extension.debug"/>
+      </call>
+      <call method="addExtension">
         <argument type="service">
           <service class="Symfony\Bundle\SecurityBundle\Twig\Extension\LogoutUrlExtension" public="false">
             <tag name="twig.extension"/>
@@ -2070,24 +2055,21 @@
       </call>
       <call method="addExtension">
         <argument type="service">
-          <service class="Twig_Extension_Debug" public="false">
-            <tag name="twig.extension"/>
-          </service>
-        </argument>
-      </call>
-      <call method="addExtension">
-        <argument type="service">
           <service class="Symfony\Bundle\AsseticBundle\Twig\AsseticExtension" public="false">
             <tag name="twig.extension"/>
             <tag name="assetic.templating.twig"/>
             <argument type="service" id="assetic.asset_factory"/>
             <argument type="service" id="templating.name_parser"/>
-            <argument>true</argument>
+            <argument>false</argument>
             <argument type="collection"/>
             <argument type="collection">
               <argument>BlogMainBundle</argument>
             </argument>
-            <argument type="service" id="assetic.value_supplier.default" on-invalid="null"/>
+            <argument type="service">
+              <service class="Symfony\Bundle\AsseticBundle\DefaultValueSupplier" public="false">
+                <argument type="service" id="service_container"/>
+              </service>
+            </argument>
           </service>
         </argument>
       </call>
@@ -2216,35 +2198,9 @@
       </argument>
       <argument>G:/htdocs/FoiTask/app/../web</argument>
       <argument>true</argument>
-      <call method="addWorker">
-        <argument type="service">
-          <service class="Symfony\Bundle\AsseticBundle\Factory\Worker\UseControllerWorker" public="false">
-            <tag name="assetic.factory_worker"/>
-          </service>
-        </argument>
-      </call>
-    </service>
-    <service id="assetic.value_supplier.default" class="Symfony\Bundle\AsseticBundle\DefaultValueSupplier" public="false">
-      <argument type="service" id="service_container"/>
     </service>
     <service id="assetic.filter.cssrewrite" class="Assetic\Filter\CssRewriteFilter">
       <tag name="assetic.filter" alias="cssrewrite"/>
-    </service>
-    <service id="assetic.controller" class="Symfony\Bundle\AsseticBundle\Controller\AsseticController" scope="prototype">
-      <argument type="service" id="request"/>
-      <argument type="service" id="assetic.asset_manager"/>
-      <argument type="service" id="assetic.cache"/>
-      <argument>false</argument>
-      <argument type="service" id="profiler" on-invalid="null"/>
-      <call method="setValueSupplier">
-        <argument type="service" id="assetic.value_supplier.default" on-invalid="ignore"/>
-      </call>
-    </service>
-    <service id="assetic.cache" class="Assetic\Cache\FilesystemCache" public="false">
-      <argument>G:/htdocs/FoiTask/app/cache/dev/assetic/assets</argument>
-    </service>
-    <service id="assetic.request_listener" class="Symfony\Bundle\AsseticBundle\EventListener\RequestListener">
-      <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest"/>
     </service>
     <service id="doctrine.dbal.connection_factory" class="Doctrine\Bundle\DoctrineBundle\ConnectionFactory">
       <argument type="collection"/>
@@ -2661,7 +2617,7 @@
           <argument key="stopwatch">templating.helper.stopwatch</argument>
           <argument key="logout_url">templating.helper.logout_url</argument>
           <argument key="security">templating.helper.security</argument>
-          <argument key="assetic">assetic.helper.dynamic</argument>
+          <argument key="assetic">assetic.helper.static</argument>
         </argument>
       </call>
     </service>
@@ -2681,7 +2637,7 @@
     <service id="router" class="Symfony\Bundle\FrameworkBundle\Routing\Router">
       <tag name="monolog.logger" channel="router"/>
       <argument type="service" id="service_container"/>
-      <argument>G:/htdocs/FoiTask/app/cache/dev/assetic/routing.yml</argument>
+      <argument>G:/htdocs/FoiTask/app/config/routing_dev.yml</argument>
       <argument type="collection">
         <argument key="cache_dir">G:/htdocs/FoiTask/app/cache/dev</argument>
         <argument key="debug">true</argument>

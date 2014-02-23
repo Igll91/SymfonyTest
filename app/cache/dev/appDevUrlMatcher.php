@@ -144,6 +144,11 @@ class appDevUrlMatcher extends Symfony\Bundle\FrameworkBundle\Routing\Redirectab
             return array (  '_controller' => 'Blog\\MainBundle\\Controller\\DefaultController::indexAction',  '_route' => '_index',);
         }
 
+        // _newCategory
+        if ($pathinfo === '/spremiKategoriju') {
+            return array (  '_controller' => 'Blog\\MainBundle\\Controller\\DefaultController::newCategory',  '_route' => '_newCategory',);
+        }
+
         throw 0 < count($allow) ? new MethodNotAllowedException(array_unique($allow)) : new ResourceNotFoundException();
     }
 }
