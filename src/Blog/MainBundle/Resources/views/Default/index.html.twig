@@ -3,17 +3,64 @@
 {% block head %}
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Moj Blog</title>
+	
+	<script type="text/javascript">
+		function validateForm(arg1, arg2)
+		{
+			var a = document.forms[arg1][arg2].value;
+			
+			if (a == "")
+			{
+			  alert("Popunite Formu!");
+			  return false;
+			}
+		}
+		
+		function onSelectorChangeg()
+		{
+			var id = document.getElementById('categorySelector').value;
+			
+			var elements = document.getElementsByClassName("tagArticle");
+			
+			for (index = 0; index < elements.length; index++) 
+			{
+				var selected = elements[index].getAttribute('data-value');
+				
+				if(id == -1)
+				{
+					elements[index].style.display = 'block';
+				}
+				else if(selected == id)
+				{
+					elements[index].style.display = 'block';
+				}
+				else
+				{
+					elements[index].style.display = 'none';
+				}
+			}		
+		}
+	</script>
+	
 {% endblock %}
 
 {% block content %}
 
 <div class="container">
+
+	{% if message %}
+		<div class="alert alert-info alert-dismissable">
+			<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+			<p class="text-center"> {{ message }} </p>
+		</div>
+	{% endif %}
+
 	<div class="row">
 		<div class="col-md-6 col-md-offset-3">
 			<p class="text-center">
 				<strong> Filtriraj po kategoriji: </strong>
 
-				<select>
+				<select onchange="javascript: onSelectorChangeg();" id="categorySelector">
 				
 					<option value = "-1" >- Ništa nije odabrano -</option>
 					
@@ -27,7 +74,7 @@
 				  +
 				</button>
 
-				{% set currentPath = path(app.request.attributes.get('_route')) ~ "spremiKategoriju" %}
+				{% set currentPathCat = path(app.request.attributes.get('_route')) ~ "spremiKategoriju" %}
 				
 				<!-- Modal -->
 				<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -38,8 +85,8 @@
 						<h4 class="modal-title" id="myModalLabel">Dodavanje nove kategorije.</h4>
 					  </div>
 					  
-					  <form role="form" method="POST" action="{{ currentPath }}" name="newCategory">
-						<input type="text" class="form-control" id="newCategoryText" name = "newCategoryText" placeholder="Unesite naziv nove kategorije...">
+					  <form role="form" method="POST" action="{{ currentPathCat }}" name="newCategory" onsubmit='javascript: return validateForm("newCategory", "newCategoryText");'>
+						<input type="text" class="form-control" id="newCategoryTextID" name = "newCategoryText" maxlength="15" placeholder="Unesite naziv nove kategorije...">
 						  <div class="modal-footer">
 							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 							<button type="submit" class="btn btn-primary">Spremi</button>
@@ -54,11 +101,22 @@
 		</div>
 	</div>
 	
+	{% set currentPathBlog = path(app.request.attributes.get('_route')) ~ "newBlog" %}
+	{% set currentPathBlogEdit = path(app.request.attributes.get('_route')) ~ "editBlog" %}
+	
+	<div class="row">
+		<form role="form" method="POST" action="{{ currentPathBlog }}" name="newBlog">
+			<button type="submit" class="btn btn btn-default btn-lg btn-block">
+					Novi Članak
+			</button>
+		</form>
+	</div>
+	
 	<div class="row">
 		<div class="col-md-8 col-md-offset-2">
 
 			{% for item in articles %}
-				<div class="jumbotron">
+				<div class="jumbotron tagArticle" data-value="{{ item.getCategory().getID() }}">
 					<div class="panel panel-info">
 						<blockquote>
 						  <p>Naslov: <strong> {{ item.getTitle() }} </strong> </p>
@@ -68,9 +126,12 @@
 				
 					<p> <kbd>{{ item.getText() }} </kbd> </p>
 					
-					<button type="button" class="btn btn btn-danger btn-lg btn-block">
-					Uredi
-					</button>
+					<form role="form" method="POST" action="{{ currentPathBlogEdit }}" name="editBlog">
+						<input type="hidden" name="id" value={{ item.getId() }}>
+						<button type="submit" class="btn btn btn-danger btn-lg btn-block">
+							Uredi
+						</button>
+					</form>
 				</div>
 			{% endfor %}
 

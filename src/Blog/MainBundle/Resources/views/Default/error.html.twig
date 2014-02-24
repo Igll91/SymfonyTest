@@ -1,0 +1,21 @@
+{% extends "BlogMainBundle::mainView.html.twig" %}
+
+{% block head %}
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Error</title>
+{% endblock %}
+
+{% block content %}
+	<div class="jumbotron">
+		<div class="alert alert-danger">
+			<p class="text-center"> {{ error }} </p>
+		</div>
+		
+		<form role="form" method="GET" action="{{ path }}" name="newCategory">
+			<button type="submit" class="btn btn-primary btn-lg btn-block">Povratak</button>
+		</form>
+	</div>
+{% endblock %}
+
+
+

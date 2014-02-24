@@ -149,6 +149,31 @@ class appDevUrlMatcher extends Symfony\Bundle\FrameworkBundle\Routing\Redirectab
             return array (  '_controller' => 'Blog\\MainBundle\\Controller\\DefaultController::newCategory',  '_route' => '_newCategory',);
         }
 
+        // _blog
+        if ($pathinfo === '/newBlog') {
+            return array (  '_controller' => 'Blog\\MainBundle\\Controller\\DefaultController::newBlog',  '_route' => '_blog',);
+        }
+
+        // _blogSave
+        if ($pathinfo === '/saveBlog') {
+            return array (  '_controller' => 'Blog\\MainBundle\\Controller\\DefaultController::saveBlog',  '_route' => '_blogSave',);
+        }
+
+        // _blogEdit
+        if ($pathinfo === '/editBlog') {
+            return array (  '_controller' => 'Blog\\MainBundle\\Controller\\DefaultController::editBlog',  '_route' => '_blogEdit',);
+        }
+
+        // _blogDelete
+        if ($pathinfo === '/deleteBlog') {
+            return array (  '_controller' => 'Blog\\MainBundle\\Controller\\DefaultController::deleteBlog',  '_route' => '_blogDelete',);
+        }
+
+        // _blogUpdate
+        if ($pathinfo === '/updateBlog') {
+            return array (  '_controller' => 'Blog\\MainBundle\\Controller\\DefaultController::updateBlog',  '_route' => '_blogUpdate',);
+        }
+
         throw 0 < count($allow) ? new MethodNotAllowedException(array_unique($allow)) : new ResourceNotFoundException();
     }
 }
